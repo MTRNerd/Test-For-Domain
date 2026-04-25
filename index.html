@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>CHEESE BOUNCE</title>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            background: #222;
+            color: #FFD700;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        #ui {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            pointer-events: none;
+            text-shadow: 2px 2px #000;
+        }
+        .cheese-ball {
+            position: absolute;
+            font-size: 50px;
+            cursor: grab;
+            user-select: none;
+            line-height: 1;
+        }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h1>GRAVITY: OFF</h1>
+    <p>CLICK TO SPAWN. DRAG TO FLING.</p>
+</div>
+
+<script>
+    const cheeses = [];
+    const emoji = ['🧀', '🧀', '🧀', '🧀', '🧀', '🧀', '🐁'];
+
+    function spawn(x, y) {
+        const el = document.createElement('div');
+        el.className = 'cheese-ball';
+        el.innerHTML = emoji[Math.floor(Math.random() * emoji.length)];
+        document.body.appendChild(el);
+
+        const obj = {
+            el: el,
+            x: x || window.innerWidth / 2,
+            y: y || window.innerHeight / 2,
+            vx: (Math.random() - 0.5) * 20,
+            vy: (Math.random() - 0.5) * 20,
+            size: 50
+        };
+        cheeses.push(obj);
+    }
+
+    function update() {
+        cheeses.forEach(c => {
+            c.x += c.vx;
+            c.y += c.vy;
+
+            // Bounce off walls
+            if (c.x <= 0 || c.x >= window.innerWidth - c.size) {
+                c.vx *= -0.9;
+                c.x = c.x <= 0 ? 0 : window.innerWidth - c.size;
+            }
+            if (c.y <= 0 || c.y >= window.innerHeight - c.size) {
+                c.vy *= -0.9;
+                c.y = c.y <= 0 ? 0 : window.innerHeight - c.size;
+            }
+
+            // Air friction
+            c.vx *= 0.99;
+            c.vy *= 0.99;
+
+            c.el.style.transform = `translate(${c.x}px, ${c.y}px)`;
+        });
+        requestAnimationFrame(update);
+    }
+
+    window.addEventListener('mousedown', (e) => {
+        spawn(e.clientX - 25, e.clientY - 25);
+    });
+
+    // Start with one
+    spawn();
+    update();
+</script>
+
+</body>
+</html>
